@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.vercel.vida_al_estilo_videojuego.twa",
+        "sha256_cert_fingerprints": ["DD:B1:BA:48:B4:E0:1B:9D:DD:5C:E0:F2:73:4D:30:0A:2F:DF:41:D7:52:9A:7E:D2:A4:E9:0F:D3:D2:BE:D1:41"]
+      }
+    }]
