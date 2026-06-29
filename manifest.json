@@ -1,0 +1,30 @@
+{
+  "name": "Habit Quest",
+  "short_name": "Habit Quest",
+  "description": "Tu vida en modo videojuego — hábitos, metas y disciplina",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#08080c",
+  "theme_color": "#cd1418",
+  "categories": [
+    "lifestyle",
+    "productivity",
+    "health"
+  ],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
