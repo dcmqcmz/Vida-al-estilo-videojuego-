@@ -1,6 +1,6 @@
 {
-  "name": "Habit Quest",
-  "short_name": "Habit Quest",
+  "name": "After Game",
+  "short_name": "After Game",
   "description": "Tu vida en modo videojuego — hábitos, metas y disciplina",
   "start_url": "./index.html",
   "scope": "./",
