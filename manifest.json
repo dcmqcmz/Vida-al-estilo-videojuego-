@@ -1,9 +1,9 @@
 {
+  "lang": "es",
   "name": "After Game",
   "short_name": "After Game",
   "description": "Tu vida en modo videojuego — hábitos, metas y disciplina",
-  "start_url": "./index.html",
-  "scope": "./",
+  "start_url": "https://vida-al-estilo-videojuego.vercel.app/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#08080c",
@@ -15,16 +15,16 @@
   ],
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "/Icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "icon-512.png",
+      "src": "/Icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
     }
   ]
 }
