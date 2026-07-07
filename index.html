@@ -1863,7 +1863,7 @@ function renderRetoNote(){
 }
 function getTreeStage(xp){return TREE_STAGES.find(t=>xp>=t.min&&xp<=t.max)||TREE_STAGES[0]}
 function updateStreak(S){const today=todayKey();if(S.lastDay===today)return;const yd=new Date();yd.setDate(yd.getDate()-1);const yds=`${yd.getFullYear()}-${String(yd.getMonth()+1).padStart(2,'0')}-${String(yd.getDate()).padStart(2,'0')}`;if(S.lastDay===yds)S.streak=(S.streak||0)+1;else S.streak=1;S.lastDay=today}
-function checkWeeklyReset(S){const wk=weekKey();if(S._lastWeekCheck===wk)return;S._lastWeekCheck=wk;const prevD=new Date();prevD.setDate(prevD.getDate()-7);const prevWk=weekKey(prevD);if((S.weekHistory[prevWk]||{}).processed)return;let total=0,done=0;for(let i=0;i<7;i++){const d=new Date(prevWk);d.setDate(d.getDate()+i);const dk=d.toISOString().slice(0,10);total+=DAILY.length+FREQUENT.length;done+=(S.dailyDone[dk]||[]).length+(S.freqDone[dk]||[]).length}total+=WEEKLY.length;done+=(S.weeklyDone[prevWk]||[]).length;const pct=total>0?(done/total)*100:0;let hpD=0;if(pct>=90)hpD=200;else if(pct>=75)hpD=100;else if(pct>=60)hpD=50;else if(pct<40)hpD=-100;S.hp=Math.min(MAX_HP,Math.max(0,S.hp+hpD));if(!(S.secretDone||{})[prevWk])S.hp=Math.max(0,S.hp-80);S.weekHistory[prevWk]={pct:Math.round(pct),hpD,processed:true};if(S.todayDayKey!==todayKey()){S.todayXP=0;S.todayGold=0;S.todayDayKey=todayKey()}save(S)}
+function checkWeeklyReset(S){const wk=weekKey();if(S._lastWeekCheck===wk)return;S._lastWeekCheck=wk;const prevD=new Date();prevD.setDate(prevD.getDate()-7);const prevWk=weekKey(prevD);if((S.weekHistory[prevWk]||{}).processed)return;let total=0,done=0,activeDays=0;for(let i=0;i<7;i++){const d=new Date(prevWk);d.setDate(d.getDate()+i);const dk=d.toISOString().slice(0,10);const dayDone=(S.dailyDone[dk]||[]).length+(S.freqDone[dk]||[]).length;if(dayDone>0){activeDays++;total+=DAILY.length+FREQUENT.length;done+=dayDone}}if(activeDays>0){total+=WEEKLY.length;done+=(S.weeklyDone[prevWk]||[]).length}const pct=total>0?(done/total)*100:0;let hpD=0;if(activeDays===0){hpD=0}else if(pct>=90)hpD=200;else if(pct>=75)hpD=100;else if(pct>=60)hpD=50;else if(pct<40)hpD=-100;S.hp=Math.min(MAX_HP,Math.max(0,S.hp+hpD));if(activeDays>0&&!(S.secretDone||{})[prevWk])S.hp=Math.max(0,S.hp-80);S.weekHistory[prevWk]={pct:Math.round(pct),hpD,processed:true};if(S.todayDayKey!==todayKey()){S.todayXP=0;S.todayGold=0;S.todayDayKey=todayKey()}save(S)}
 function applyTheme(state){const st=state||load();const t=THEMES.find(x=>x.id===st.theme)||THEMES[0];const r=document.documentElement.style;r.setProperty('--bg',t.bg);r.setProperty('--surface',t.surface);r.setProperty('--card',t.card);r.setProperty('--card2',t.card2||t.card);r.setProperty('--border',t.border);r.setProperty('--text',t.text);r.setProperty('--muted',t.muted);r.setProperty('--accent',st.accent||'#7c3aed');r.setProperty('--accent2',getAccent2(st.accent||'#7c3aed'));if(st.theme==='terminal'){document.body.classList.add('theme-terminal')}else{document.body.classList.remove('theme-terminal')}}
 // Derive a complementary second accent for gradients (slightly shifted, same family)
 function getAccent2(hex){const map={'#7c3aed':'#06b6d4','#06b6d4':'#3b82f6','#10b981':'#06b6d4','#f59e0b':'#f97316','#ef4444':'#f43f5e','#ec4899':'#a855f7','#8b5cf6':'#6366f1','#3b82f6':'#06b6d4','#f97316':'#f59e0b','#14b8a6':'#10b981','#a855f7':'#7c3aed','#22c55e':'#10b981'};return map[hex]||hex}
@@ -2107,9 +2107,9 @@ function renderStats(todayD,todayF,thisW,wk){
   const S=load();const sg=document.getElementById('stats-grid');if(!sg)return;
   sg.innerHTML=`<div class="stat-card"><div class="sc-val">${S.totalXP}</div><div class="sc-lbl">XP TOTAL</div></div><div class="stat-card"><div class="sc-val">${S.gold}</div><div class="sc-lbl">💰 VAROS</div></div><div class="stat-card"><div class="sc-val">${Math.max(0,S.hp)}</div><div class="sc-lbl">❤️ HP</div></div><div class="stat-card"><div class="sc-val">${S.streak||0}</div><div class="sc-lbl">🔥 RACHA</div></div><div class="stat-card"><div class="sc-val">${Object.keys(S.dailyDone).length}</div><div class="sc-lbl">DÍAS JUGADOS</div></div><div class="stat-card"><div class="sc-val">${S.perfectDays||0}</div><div class="sc-lbl">PERFECTOS</div></div><div class="stat-card"><div class="sc-val">${(S.secondaryDone||[]).length}</div><div class="sc-lbl">MIS. SECUNDARIAS</div></div><div class="stat-card"><div class="sc-val">${S.secretsDone||0}</div><div class="sc-lbl">MIS. SECRETAS</div></div>`;
   // RANKING
-  const rw=document.getElementById('ranking-weeks');if(rw){rw.innerHTML='';const wPcts=[];for(let i=7;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i*7);const wkk=weekKey(d.toISOString().slice(0,10));let tot=0,don=0;for(let j=0;j<7;j++){const dd=new Date(wkk);dd.setDate(dd.getDate()+j);const dk=dd.toISOString().slice(0,10);tot+=DAILY.length+FREQUENT.length;don+=(S.dailyDone[dk]||[]).length+(S.freqDone[dk]||[]).length}tot+=WEEKLY.length;don+=(S.weeklyDone[wkk]||[]).length;wPcts.push({pct:tot>0?Math.round((don/tot)*100):0})}const best=Math.max(...wPcts.map(x=>x.pct));wPcts.forEach((w,i)=>{const el=document.createElement('div');el.className='rw-item'+(w.pct===best&&w.pct>0?' best':'');el.innerHTML=`<div class="rw-lbl">S${i+1}${i===7?' HOY':''}</div><div class="rw-val" style="color:${w.pct>=90?'var(--green)':w.pct>=60?'var(--gold)':'var(--accent)'}">${w.pct}%</div>`;rw.appendChild(el)})}
+  const rw=document.getElementById('ranking-weeks');if(rw){rw.innerHTML='';const wPcts=[];for(let i=7;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i*7);const wkk=weekKey(d.toISOString().slice(0,10));let tot=0,don=0,act=0;for(let j=0;j<7;j++){const dd=new Date(wkk);dd.setDate(dd.getDate()+j);const dk=dd.toISOString().slice(0,10);const dn=(S.dailyDone[dk]||[]).length+(S.freqDone[dk]||[]).length;if(dn>0){act++;tot+=DAILY.length+FREQUENT.length;don+=dn}}if(act>0){tot+=WEEKLY.length;don+=(S.weeklyDone[wkk]||[]).length};wPcts.push({pct:tot>0?Math.round((don/tot)*100):0})}const best=Math.max(...wPcts.map(x=>x.pct));wPcts.forEach((w,i)=>{const el=document.createElement('div');el.className='rw-item'+(w.pct===best&&w.pct>0?' best':'');el.innerHTML=`<div class="rw-lbl">S${i+1}${i===7?' HOY':''}</div><div class="rw-val" style="color:${w.pct>=90?'var(--green)':w.pct>=60?'var(--gold)':'var(--accent)'}">${w.pct}%</div>`;rw.appendChild(el)})}
   // CHART
-  const cb=document.getElementById('chart-bars');if(cb){cb.innerHTML='';for(let i=7;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i*7);const wkk=weekKey(d.toISOString().slice(0,10));let tot=0,don=0;for(let j=0;j<7;j++){const dd=new Date(wkk);dd.setDate(dd.getDate()+j);const dk=dd.toISOString().slice(0,10);tot+=DAILY.length+FREQUENT.length;don+=(S.dailyDone[dk]||[]).length+(S.freqDone[dk]||[]).length}tot+=WEEKLY.length;don+=(S.weeklyDone[wkk]||[]).length;const pct=tot>0?Math.round((don/tot)*100):0;const col=document.createElement('div');col.className='chart-col';const color=pct>=90?'var(--green)':pct>=60?'var(--p3)':'var(--accent)';col.innerHTML=`<div class="chart-bar" style="height:${pct}%;background:${color};width:100%"></div><div class="chart-lbl">S${8-i}</div>`;cb.appendChild(col)}}
+  const cb=document.getElementById('chart-bars');if(cb){cb.innerHTML='';for(let i=7;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i*7);const wkk=weekKey(d.toISOString().slice(0,10));let tot=0,don=0,act=0;for(let j=0;j<7;j++){const dd=new Date(wkk);dd.setDate(dd.getDate()+j);const dk=dd.toISOString().slice(0,10);const dn=(S.dailyDone[dk]||[]).length+(S.freqDone[dk]||[]).length;if(dn>0){act++;tot+=DAILY.length+FREQUENT.length;don+=dn}}if(act>0){tot+=WEEKLY.length;don+=(S.weeklyDone[wkk]||[]).length};const pct=tot>0?Math.round((don/tot)*100):0;const col=document.createElement('div');col.className='chart-col';const color=pct>=90?'var(--green)':pct>=60?'var(--p3)':'var(--accent)';col.innerHTML=`<div class="chart-bar" style="height:${pct}%;background:${color};width:100%"></div><div class="chart-lbl">S${8-i}</div>`;cb.appendChild(col)}}
   // AREA CHARTS
   const ac=document.getElementById('area-charts');if(ac){ac.innerHTML='';const last7=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);last7.push(d.toISOString().slice(0,10));}[{title:'😴 Sueño',hid:'sleep',field:'horas',color:'#06b6d4',unit:'h'},{title:'🧠 Meditación',hid:'mental',field:'minutos',color:'#8b5cf6',unit:'min'},{title:'💧 Hidratación',hid:'water',field:'vasos',color:'#22d3ee',unit:'v'},{title:'🥗 Calorías',hid:'food',field:'calorias',color:'#10b981',unit:'cal'}].forEach(def=>{const vals=last7.map(dk=>((S.logData||{})[dk]||{})[def.hid]?((S.logData[dk][def.hid]||{})[def.field]||0):0);const maxV=Math.max(...vals,1);const avg=vals.filter(v=>v>0).length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.filter(v=>v>0).length):0;const div=document.createElement('div');div.className='area-detail';const bars=vals.map((v,i)=>{const h2=maxV>0?Math.round((v/maxV)*100):0;const l=['L','M','X','J','V','S','D'][new Date(last7[i]).getDay()];return`<div class="chart-col"><div class="mini-bar" style="height:${h2}%;background:${def.color};width:100%"></div><div class="mini-lbl">${l}</div></div>`}).join('');div.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:13px;font-weight:700">${def.title}</div></div><div class="mini-chart">${bars}</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span style="font-family:monospace;font-size:9px;padding:3px 8px;border-radius:5px;background:rgba(255,255,255,.04);color:var(--muted)">Prom: ${avg}${def.unit}</span><span style="font-family:monospace;font-size:9px;padding:3px 8px;border-radius:5px;background:rgba(255,255,255,.04);color:var(--muted)">Total 7d: ${vals.reduce((a,b)=>a+b,0)}${def.unit}</span></div>`;ac.appendChild(div)})}
   // AREAS GRID
@@ -3063,7 +3063,14 @@ function toggleTreeAcc(id) {
   if (!S.treeActiveAcc) S.treeActiveAcc = [];
   const idx = S.treeActiveAcc.indexOf(id);
   if (idx > -1) S.treeActiveAcc.splice(idx,1);
-  else S.treeActiveAcc.push(id);
+  else {
+    S.treeActiveAcc.push(id);
+    // Hint la primera vez
+    if (!S.seenDragHint) {
+      S.seenDragHint = true;
+      setTimeout(()=>showTreeBubble('¡Arrastra el accesorio a donde quieras! ✋'), 300);
+    }
+  }
   save(S);
   renderTreeShop();
   renderTreePanelSVG();
@@ -3075,16 +3082,111 @@ function renderTreePanelSVG() {
   const svg = document.getElementById('tree-panel-svg');
   if (!svg) return;
   const costume = getTreeCostume();
-  const active = S.treeActiveAcc || [];
-  const accExtras = active.map(id => {
-    const item = TREE_SHOP_ITEMS.find(i=>i.id===id);
-    return item ? `<text x="30" y="6" text-anchor="middle" font-size="12">${item.emoji}</text>` : '';
-  }).join('');
-  svg.innerHTML = (TREE_SVGS[ts.name]||TREE_SVGS['SEMILLA']) + getCostumeExtra(costume) + accExtras;
+  svg.innerHTML = (TREE_SVGS[ts.name]||TREE_SVGS['SEMILLA']) + getCostumeExtra(costume);
   svg.style.animation = 'treeSway 4s ease-in-out infinite, treePulse 3s ease-in-out infinite, treeGlow 3s ease-in-out infinite';
   // Partículas en el panel
   const wrap = document.getElementById('tree-panel-wrap');
   startTreeParticles(wrap);
+  // Accesorios arrastrables (capa aparte)
+  renderDraggableAccessories();
+}
+
+// ============================
+// 🎯 ACCESORIOS ARRASTRABLES
+// ============================
+function renderDraggableAccessories() {
+  const scene = document.getElementById('tree-scene');
+  if (!scene) return;
+  let layer = document.getElementById('tree-acc-layer');
+  if (!layer) {
+    layer = document.createElement('div');
+    layer.id = 'tree-acc-layer';
+    layer.style.cssText = 'position:absolute;inset:0;z-index:7;pointer-events:none';
+    // Insertar antes de la barra de crecimiento (dentro de la escena)
+    scene.appendChild(layer);
+  }
+  const S = load();
+  const active = S.treeActiveAcc || [];
+  const positions = S.treeAccPositions || {};
+
+  // Limpiar los que ya no están activos
+  Array.from(layer.children).forEach(ch => {
+    if (!active.includes(ch.dataset.accId)) ch.remove();
+  });
+
+  active.forEach((id, i) => {
+    const item = TREE_SHOP_ITEMS.find(x=>x.id===id);
+    if (!item) return;
+    let el = layer.querySelector(`[data-acc-id="${id}"]`);
+    if (!el) {
+      el = document.createElement('div');
+      el.dataset.accId = id;
+      el.textContent = item.emoji;
+      el.style.cssText = 'position:absolute;font-size:32px;cursor:grab;pointer-events:auto;user-select:none;touch-action:none;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5));transition:transform .1s;line-height:1';
+      // Posición guardada o default (escalonada arriba del árbol)
+      const pos = positions[id] || { xp: 50, yp: 32 + i*8 };
+      el.style.left = pos.xp + '%';
+      el.style.top = pos.yp + '%';
+      el.style.transform = 'translate(-50%,-50%)';
+      makeDraggable(el, id, layer);
+      layer.appendChild(el);
+    }
+  });
+}
+
+function makeDraggable(el, id, layer) {
+  let dragging = false, startX, startY, origX, origY;
+
+  const onDown = (e) => {
+    dragging = true;
+    el.style.cursor = 'grabbing';
+    el.style.transform = 'translate(-50%,-50%) scale(1.2)';
+    el.style.zIndex = '20';
+    const pt = e.touches ? e.touches[0] : e;
+    startX = pt.clientX; startY = pt.clientY;
+    const rect = el.getBoundingClientRect();
+    const lrect = layer.getBoundingClientRect();
+    origX = rect.left + rect.width/2 - lrect.left;
+    origY = rect.top + rect.height/2 - lrect.top;
+    e.preventDefault();
+  };
+
+  const onMove = (e) => {
+    if (!dragging) return;
+    const pt = e.touches ? e.touches[0] : e;
+    const lrect = layer.getBoundingClientRect();
+    let nx = origX + (pt.clientX - startX);
+    let ny = origY + (pt.clientY - startY);
+    // Limitar dentro de la escena
+    nx = Math.max(0, Math.min(lrect.width, nx));
+    ny = Math.max(0, Math.min(lrect.height, ny));
+    el.style.left = (nx/lrect.width*100) + '%';
+    el.style.top = (ny/lrect.height*100) + '%';
+    e.preventDefault();
+  };
+
+  const onUp = () => {
+    if (!dragging) return;
+    dragging = false;
+    el.style.cursor = 'grab';
+    el.style.transform = 'translate(-50%,-50%)';
+    el.style.zIndex = '';
+    // Guardar posición
+    const S = load();
+    if (!S.treeAccPositions) S.treeAccPositions = {};
+    S.treeAccPositions[id] = {
+      xp: parseFloat(el.style.left),
+      yp: parseFloat(el.style.top)
+    };
+    save(S);
+  };
+
+  el.addEventListener('mousedown', onDown);
+  el.addEventListener('touchstart', onDown, {passive:false});
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('touchmove', onMove, {passive:false});
+  document.addEventListener('mouseup', onUp);
+  document.addEventListener('touchend', onUp);
 }
 
 function openTreePanel() {
