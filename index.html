@@ -960,6 +960,7 @@ span.ic svg{width:100%;height:100%}
   <div class="more-tabs">
     <button class="more-tab active" onclick="showMore('metas')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg></span> Metas</button>
     <button class="more-tab" onclick="showMore('finanzas')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-2"/><path d="M21 12h-6a2 2 0 000 4h6v-4z"/></svg></span> Finanzas</button>
+    <button class="more-tab" onclick="showMore('super')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></span> Súper</button>
     <button class="more-tab" onclick="showMore('gym')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5l11 11M3 10l-1 1 3 3M21 14l1-1-3-3M7 3L5 5M19 21l-2-2M2 6l4-4M18 22l4-4"/></svg></span> Gym</button>
     <button class="more-tab" onclick="showMore('dieta')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11a5 5 0 0110 0"/><path d="M4 11h16l-1.3 6a2 2 0 01-2 1.5H7.3a2 2 0 01-2-1.5L4 11z"/><path d="M12 6V4"/></svg></span> Dieta</button>
     <button class="more-tab" onclick="showMore('diario')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span> Diario</button>
@@ -997,18 +998,41 @@ span.ic svg{width:100%;height:100%}
     </div>
     <div class="st"><span class="ic" style="color:#06b6d4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-2"/><path d="M21 12h-6a2 2 0 000 4h6v-4z"/></svg></span> Movimientos</div>
     <div style="padding:0 16px" id="movimientos-list"></div>
-
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 16px 10px">
-      <div>
-        <div style="font-size:15px;font-weight:800">Lista de compras</div>
-        <div style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace"><span id="shopping-count">0</span> pendientes · <span id="shopping-total">$0</span> total</div>
-      </div>
-      <button onclick="openShoppingModal()" style="background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;padding:7px 14px;border-radius:10px;font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer">+ Agregar</button>
-    </div>
-    <div style="padding:0 16px" id="shopping-list"></div>
   </div>
 
-  <div id="more-gym" style="display:none">
+  <div id="more-super" style="display:none">
+    <!-- Barra de progreso de compra -->
+    <div style="margin:0 16px 14px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-size:13px;font-weight:700">👻 Compra de esta semana</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold)" id="super-progress-txt">0%</div>
+      </div>
+      <div class="bar" style="height:10px;margin-bottom:8px"><div class="bar-f" id="super-progress-bar" style="width:0%;background:linear-gradient(90deg,var(--green),#34d399)"></div></div>
+      <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)">
+        <span><span id="super-count">0</span> productos · <span id="super-checked">0</span> en el carrito</span>
+        <span style="color:var(--gold)">Total: $<span id="super-total">0</span></span>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div style="display:flex;gap:8px;padding:0 16px;margin-bottom:14px">
+      <button onclick="openSuperAddModal()" style="flex:1;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;padding:10px;border-radius:12px;font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer">➕ Agregar producto</button>
+      <button onclick="autoFillSuper()" style="flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:12px;font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer">✨ Autollenar</button>
+    </div>
+
+    <!-- Sugerencias inteligentes -->
+    <div id="super-suggestions" style="padding:0 16px;margin-bottom:14px"></div>
+
+    <!-- Lista por categorías -->
+    <div id="super-list" style="padding:0 16px"></div>
+
+    <!-- Botón finalizar -->
+    <div style="padding:16px;display:none" id="super-finish-wrap">
+      <button onclick="finishSuperShopping()" style="width:100%;background:linear-gradient(135deg,var(--green),#059669);border:none;color:#fff;padding:14px;border-radius:14px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;cursor:pointer">✅ Finalizar compra y descontar del sobre</button>
+    </div>
+  </div>
+
+
     <div class="gym-subnav">
       <button class="gym-subtab active" onclick="switchGymView('today')" id="gym-subtab-today">Hoy</button>
       <button class="gym-subtab" onclick="switchGymView('week')" id="gym-subtab-week">Mi Rutina</button>
@@ -1828,7 +1852,7 @@ function todayKey(){const d=new Date();return `${d.getFullYear()}-${String(d.get
 function dateKey(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function weekKey(d){const date=d?new Date(d):new Date();const day=date.getDay();const diff=date.getDate()-day+(day===0?-6:1);const mon=new Date(date);mon.setDate(diff);return `${mon.getFullYear()}-${String(mon.getMonth()+1).padStart(2,'0')}-${String(mon.getDate()).padStart(2,'0')}`}
 function getWeekNum(ds){const d=new Date(ds);const jan=new Date(d.getFullYear(),0,1);return Math.ceil((((d-jan)/86400000)+jan.getDay()+1)/7)}
-function defaultState(){return{hp:MAX_HP,gold:0,totalXP:0,totalGoldEarned:0,areaXP:{},streak:0,lastDay:'',perfectDays:0,habitCount:{},secretsDone:0,dailyDone:{},freqDone:{},weeklyDone:{},quejas:{},secretDone:{},secretLearned:{},weekHistory:{},logData:{},shopLog:[],metas:[],movimientos:[],gymExercises:{},dietaData:{},diarioData:{},confesData:[],cartasData:[],rutinaManana:[],rutinaNoche:[],secondaryDone:[],shoppingList:[],gymCalories:{},playerName:'Jugador',playerAvatar:'🧙',treeName:'Mi árbol',dead:false,_lastWeekCheck:'',theme:'dark',accent:'#7c3aed',pin:'',pinEnabled:false,todayXP:0,todayGold:0,todayDayKey:'',pomoSessions:0,pomoSessionsDay:''}}
+function defaultState(){return{hp:MAX_HP,gold:0,totalXP:0,totalGoldEarned:0,areaXP:{},streak:0,lastDay:'',perfectDays:0,habitCount:{},secretsDone:0,dailyDone:{},freqDone:{},weeklyDone:{},quejas:{},secretDone:{},secretLearned:{},weekHistory:{},logData:{},shopLog:[],metas:[],movimientos:[],gymExercises:{},dietaData:{},diarioData:{},confesData:[],cartasData:[],rutinaManana:[],rutinaNoche:[],secondaryDone:[],shoppingList:[],superList:[],superHistory:{},gymCalories:{},playerName:'Jugador',playerAvatar:'🧙',treeName:'Mi árbol',dead:false,_lastWeekCheck:'',theme:'dark',accent:'#7c3aed',pin:'',pinEnabled:false,todayXP:0,todayGold:0,todayDayKey:'',pomoSessions:0,pomoSessionsDay:''}}
 function load(){const r=localStorage.getItem('hqv6');if(!r)return defaultState();try{return{...defaultState(),...JSON.parse(r)}}catch(e){return defaultState()}}
 function save(s){localStorage.setItem('hqv6',JSON.stringify(s))}
 function getGlobalLevel(xp){let c=GLOBAL_LEVELS[0];for(const l of GLOBAL_LEVELS){if(xp>=l.xp)c=l}return c}
@@ -2367,27 +2391,230 @@ function renderMetaTpl(){const list=document.getElementById('meta-tpl-list');if(
   list.appendChild(grid)}
 function useMetaTemplate(tpl){const deadline=new Date();deadline.setDate(deadline.getDate()+tpl.dias);if(!S.metas)S.metas=[];S.metas.push({titulo:tpl.titulo,emoji:tpl.emoji,ico:tpl.ico,grad:tpl.grad,deadline:dateKey(deadline),pct:0,createdDate:todayKey()});save(S);closeModal('modal-meta-tpl');render();toast(`🎯 Meta: ${tpl.titulo}`)}
 // SHOPPING LIST
-function openShoppingModal(){const sel=document.getElementById('shop-item-cat');sel.innerHTML='';SHOPPING_CATEGORIES.forEach(c=>{const o=document.createElement('option');o.textContent=c;sel.appendChild(o)});document.getElementById('shop-item-name').value='';document.getElementById('shop-item-price').value='';openModal('modal-shopping')}
-function saveShoppingItem(){const name=document.getElementById('shop-item-name').value.trim();if(!name){toast('❌ Escribe qué necesitas');return}const price=parseFloat(document.getElementById('shop-item-price').value)||0;const cat=document.getElementById('shop-item-cat').value;const priority=document.getElementById('shop-item-priority').value;if(!S.shoppingList)S.shoppingList=[];S.shoppingList.push({name,price,cat,priority,bought:false,id:Date.now()});save(S);closeModal('modal-shopping');renderShopping();toast(`🛒 ${name} agregado a la lista`)}
-function toggleShoppingItem(id){const item=(S.shoppingList||[]).find(i=>i.id===id);if(item){item.bought=!item.bought;save(S);renderShopping()}}
-function delShoppingItem(id){S.shoppingList=(S.shoppingList||[]).filter(i=>i.id!==id);save(S);renderShopping()}
-function renderShopping(){
-  const S2=load();const list=document.getElementById('shopping-list');if(!list)return;list.innerHTML='';
-  const items=S2.shoppingList||[];
-  const pending=items.filter(i=>!i.bought),bought=items.filter(i=>i.bought);
-  const totalPending=pending.reduce((a,b)=>a+(b.price||0),0);
-  if(document.getElementById('shopping-total'))document.getElementById('shopping-total').textContent=`$${totalPending.toLocaleString('es-MX')}`;
-  if(document.getElementById('shopping-count'))document.getElementById('shopping-count').textContent=pending.length;
-  const prioOrder={alta:0,media:1,baja:2};const prioColor={alta:'#ef4444',media:'#f59e0b',baja:'#10b981'};const prioLabel={alta:'ALTA',media:'MEDIA',baja:'BAJA'};
-  const sortedPending=[...pending].sort((a,b)=>prioOrder[a.priority]-prioOrder[b.priority]);
-  if(items.length===0){list.innerHTML='<div style="text-align:center;color:var(--muted);font-size:12px;padding:24px;font-family:\'JetBrains Mono\',monospace">Sin artículos. Toca "+ Agregar" para empezar 🛒</div>';return}
-  sortedPending.forEach(item=>{const div=document.createElement('div');div.style.cssText='display:flex;align-items:center;gap:11px;padding:12px;border-radius:12px;background:var(--surface);border:1px solid var(--border);margin-bottom:8px';
-    div.innerHTML=`<div onclick="toggleShoppingItem(${item.id})" style="width:24px;height:24px;border-radius:7px;border:2px solid ${prioColor[item.priority]};cursor:pointer;flex-shrink:0"></div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">${item.name}</div><div style="display:flex;gap:6px;margin-top:3px;align-items:center"><span style="font-family:'JetBrains Mono',monospace;font-size:8px;padding:2px 6px;border-radius:4px;background:${prioColor[item.priority]}22;color:${prioColor[item.priority]}">${prioLabel[item.priority]}</span><span style="font-size:10px;color:var(--muted)">${item.cat}</span></div></div><div style="text-align:right;flex-shrink:0"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--gold)">$${(item.price||0).toLocaleString('es-MX')}</div><div onclick="delShoppingItem(${item.id})" style="font-size:10px;color:var(--muted);cursor:pointer;margin-top:2px">eliminar</div></div>`;
-    list.appendChild(div)});
-  if(bought.length>0){const sep=document.createElement('div');sep.style.cssText='font-family:\'JetBrains Mono\',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;margin:12px 0 8px';sep.textContent='✓ COMPRADO';list.appendChild(sep);
-    bought.forEach(item=>{const div=document.createElement('div');div.style.cssText='display:flex;align-items:center;gap:11px;padding:12px;border-radius:12px;background:var(--surface);border:1px solid var(--border);margin-bottom:8px;opacity:.5';
-      div.innerHTML=`<div onclick="toggleShoppingItem(${item.id})" style="width:24px;height:24px;border-radius:7px;background:var(--green);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div><div style="flex:1;text-decoration:line-through"><div style="font-size:13px;font-weight:600">${item.name}</div></div><div onclick="delShoppingItem(${item.id})" style="font-size:14px;color:var(--muted);cursor:pointer">✕</div>`;
-      list.appendChild(div)})}
+// ============================
+// 👻 SÚPER — Lista inteligente
+// ============================
+const SUPER_CATS=[
+  {id:'proteinas',name:'Proteínas',emoji:'🍗'},
+  {id:'carbos',name:'Carbohidratos',emoji:'🍞'},
+  {id:'lacteos',name:'Lácteos y bebidas',emoji:'🥛'},
+  {id:'frutas',name:'Frutas y verduras',emoji:'🥬'},
+  {id:'despensa',name:'Despensa',emoji:'🫘'},
+  {id:'limpieza',name:'Limpieza',emoji:'🧼'},
+  {id:'gustitos',name:'Gustitos',emoji:'😮‍💨'},
+  {id:'otro',name:'Otro',emoji:'🛒'},
+];
+// Productos con precio oficial Soriana Guanajuato (jul 2026) y días de recompra
+const SUPER_COMMON=[
+  // Proteínas
+  {name:'Pechuga de pollo',cat:'proteinas',price:210,every:7},
+  {name:'Huevos',cat:'proteinas',price:108,every:7},
+  {name:'Atún',cat:'proteinas',price:42,every:7},
+  {name:'Yogurt griego',cat:'proteinas',price:70,every:7},
+  {name:'Jamón de pavo',cat:'proteinas',price:90,every:7},
+  {name:'Queso americano',cat:'proteinas',price:45,every:10},
+  {name:'Queso Oaxaca',cat:'proteinas',price:102,every:14},
+  // Carbohidratos
+  {name:'Pan Bimbo',cat:'carbos',price:70,every:7},
+  {name:'Tortillas',cat:'carbos',price:37,every:4},
+  {name:'Arroz',cat:'carbos',price:50,every:30},
+  {name:'Avena',cat:'carbos',price:41,every:30},
+  {name:'Papas',cat:'carbos',price:62,every:10},
+  {name:'Cereal',cat:'carbos',price:71,every:14},
+  // Lácteos y bebidas
+  {name:'Leche',cat:'lacteos',price:47,every:5},
+  {name:'Garrafón de agua',cat:'lacteos',price:66,every:7},
+  {name:'Refresco Zero',cat:'lacteos',price:38,every:7},
+  // Frutas y verduras
+  {name:'Aguacate',cat:'frutas',price:95,every:7},
+  {name:'Fruta de temporada',cat:'frutas',price:47,every:7},
+  {name:'Verduras',cat:'frutas',price:57,every:7},
+  // Despensa
+  {name:'Frijoles',cat:'despensa',price:41,every:30},
+  {name:'Aceite',cat:'despensa',price:62,every:30},
+  {name:'Sal',cat:'despensa',price:37,every:60},
+  {name:'Salsa',cat:'despensa',price:36,every:21},
+  // Limpieza
+  {name:'Papel higiénico',cat:'limpieza',price:55,every:21},
+  {name:'Jabón Salvo',cat:'limpieza',price:68,every:30},
+  {name:'Esponja',cat:'limpieza',price:35,every:30},
+  {name:'Detergente',cat:'limpieza',price:62,every:30},
+  {name:'Limpiador',cat:'limpieza',price:44,every:30},
+  {name:'Bolsas para basura',cat:'limpieza',price:50,every:30},
+  {name:'Cloro',cat:'limpieza',price:38,every:30},
+  // Gustitos
+  {name:'Sabritas',cat:'gustitos',price:70,every:7},
+  {name:'Chocolate',cat:'gustitos',price:40,every:7},
+];
+
+function openSuperAddModal(pre){
+  const sel=document.getElementById('super-item-cat');sel.innerHTML='';
+  SUPER_CATS.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.emoji} ${c.name}`;sel.appendChild(o)});
+  document.getElementById('super-item-name').value=pre?pre.name:'';
+  document.getElementById('super-item-price').value=pre?pre.price:'';
+  if(pre)sel.value=pre.cat;
+  openModal('modal-super');
+}
+function saveSuperItem(){
+  const name=document.getElementById('super-item-name').value.trim();
+  if(!name){toast('❌ Escribe qué necesitas');return}
+  const price=parseFloat(document.getElementById('super-item-price').value)||0;
+  const cat=document.getElementById('super-item-cat').value;
+  if(!S.superList)S.superList=[];
+  S.superList.push({name,price,cat,checked:false,id:Date.now()});
+  save(S);closeModal('modal-super');renderSuper();toast(`🛒 ${name} agregado`);
+}
+function toggleSuperItem(id){
+  const item=(S.superList||[]).find(i=>i.id===id);
+  if(item){item.checked=!item.checked;save(S);renderSuper()}
+}
+function delSuperItem(id){
+  S.superList=(S.superList||[]).filter(i=>i.id!==id);
+  save(S);renderSuper();
+}
+// Autollenar: esenciales + según historial + por agotarse
+function autoFillSuper(){
+  if(!S.superList)S.superList=[];
+  const hist=S.superHistory||{};
+  const existing=new Set((S.superList||[]).map(i=>i.name.toLowerCase()));
+  let added=0;
+  // Productos que compras seguido (historial) o esenciales base
+  SUPER_COMMON.forEach(prod=>{
+    const h=hist[prod.name.toLowerCase()];
+    // Si lo has comprado 2+ veces, se considera recurrente
+    const recurrent = h && h.count>=2;
+    // Esenciales base que siempre sugerimos aunque no haya historial
+    const essential = ['Pechuga de pollo','Huevos','Atún','Yogurt griego','Jamón de pavo','Pan Bimbo','Tortillas','Leche','Garrafón de agua'].includes(prod.name);
+    if((recurrent||essential) && !existing.has(prod.name.toLowerCase())){
+      S.superList.push({name:prod.name,price:h&&h.price?h.price:prod.price,cat:prod.cat,checked:false,id:Date.now()+added});
+      added++;
+    }
+  });
+  save(S);renderSuper();
+  toast(added>0?`✨ ${added} productos agregados`:'Ya tienes tus productos frecuentes');
+}
+// Detecta productos "por agotarse" según cuándo los compraste
+function getSuperRunningLow(){
+  const hist=S.superHistory||{};const now=Date.now();const low=[];
+  Object.entries(hist).forEach(([key,h])=>{
+    if(!h.lastBought)return;
+    const prod=SUPER_COMMON.find(p=>p.name.toLowerCase()===key);
+    const every=(prod?prod.every:h.every)||14;
+    const daysSince=Math.floor((now-h.lastBought)/86400000);
+    // Si ya pasó el 85% del ciclo, está por agotarse
+    if(daysSince>=every*0.85){
+      low.push({name:h.name||key,cat:h.cat||'otro',price:h.price||0,daysSince,every});
+    }
+  });
+  return low.sort((a,b)=>b.daysSince-a.daysSince);
+}
+function addLowToList(name,cat,price){
+  if(!S.superList)S.superList=[];
+  if((S.superList||[]).some(i=>i.name.toLowerCase()===name.toLowerCase())){toast('Ya está en la lista');return}
+  S.superList.push({name,price,cat,checked:false,id:Date.now()});
+  save(S);renderSuper();toast(`⚠ ${name} agregado`);
+}
+
+function renderSuper(){
+  const S2=load();
+  const wrap=document.getElementById('super-list');if(!wrap)return;
+  const items=S2.superList||[];
+  const checked=items.filter(i=>i.checked);
+  const total=items.reduce((a,b)=>a+(b.price||0),0);
+  const checkedTotal=checked.reduce((a,b)=>a+(b.price||0),0);
+  const pct=items.length>0?Math.round((checked.length/items.length)*100):0;
+  // Barra
+  const pb=document.getElementById('super-progress-bar');if(pb)pb.style.width=pct+'%';
+  const pt=document.getElementById('super-progress-txt');if(pt)pt.textContent=pct+'%';
+  const sc=document.getElementById('super-count');if(sc)sc.textContent=items.length;
+  const sch=document.getElementById('super-checked');if(sch)sch.textContent=checked.length;
+  const st=document.getElementById('super-total');if(st)st.textContent=total.toLocaleString('es-MX');
+  // Botón finalizar
+  const fw=document.getElementById('super-finish-wrap');
+  if(fw)fw.style.display=checked.length>0?'block':'none';
+
+  // Sugerencias "por agotarse"
+  const sugWrap=document.getElementById('super-suggestions');
+  const low=getSuperRunningLow().filter(l=>!items.some(i=>i.name.toLowerCase()===l.name.toLowerCase()));
+  if(sugWrap){
+    if(low.length>0){
+      sugWrap.innerHTML=`<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:14px;padding:12px">
+        <div style="font-size:11px;font-weight:700;color:#f59e0b;margin-bottom:8px;font-family:'JetBrains Mono',monospace">⚠ PRODUCTOS POR AGOTARSE</div>
+        ${low.slice(0,5).map(l=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0">
+          <div style="font-size:12px">${l.name} <span style="color:var(--muted);font-size:9px">· hace ${l.daysSince}d</span></div>
+          <button onclick="addLowToList('${l.name.replace(/'/g,"\\'")}','${l.cat}',${l.price})" style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#f59e0b;padding:3px 10px;border-radius:8px;font-size:10px;cursor:pointer;font-family:'JetBrains Mono',monospace">+ Agregar</button>
+        </div>`).join('')}
+      </div>`;
+    } else sugWrap.innerHTML='';
+  }
+
+  // Lista agrupada por categoría
+  if(items.length===0){
+    wrap.innerHTML='<div style="text-align:center;color:var(--muted);font-size:12px;padding:30px;font-family:\'JetBrains Mono\',monospace">Lista vacía 👻<br><br>Toca "✨ Autollenar" para empezar<br>con tus productos frecuentes</div>';
+    return;
+  }
+  wrap.innerHTML='';
+  if(!window._superOpenCats)window._superOpenCats={};
+  SUPER_CATS.forEach(cat=>{
+    const catItems=items.filter(i=>i.cat===cat.id);
+    if(catItems.length===0)return;
+    const catChecked=catItems.filter(i=>i.checked).length;
+    const catTotal=catItems.reduce((a,b)=>a+(b.price||0),0);
+    const isOpen=window._superOpenCats[cat.id]!==false; // abierto por defecto
+    const section=document.createElement('div');section.style.marginBottom='10px';
+    // Header colapsable
+    const header=document.createElement('div');
+    header.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:12px;background:var(--card);border:1px solid var(--border);cursor:pointer';
+    header.innerHTML=`<div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:18px">${cat.emoji}</span>
+        <span style="font-size:13px;font-weight:700">${cat.name}</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted)">${catChecked}/${catItems.length}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold)">$${catTotal.toLocaleString('es-MX')}</span>
+        <span style="font-size:12px;color:var(--muted);transform:rotate(${isOpen?'90':'0'}deg);transition:transform .2s">▶</span>
+      </div>`;
+    header.onclick=()=>{window._superOpenCats[cat.id]=!isOpen;renderSuper()};
+    section.appendChild(header);
+    // Contenido
+    if(isOpen){
+      const body=document.createElement('div');body.style.cssText='padding:8px 4px 0';
+      catItems.forEach(item=>{
+        const div=document.createElement('div');
+        div.style.cssText=`display:flex;align-items:center;gap:11px;padding:10px;border-radius:10px;background:var(--surface);border:1px solid ${item.checked?'var(--green)':'var(--border)'};margin-bottom:6px;${item.checked?'opacity:.6':''}`;
+        div.innerHTML=`<div onclick="toggleSuperItem(${item.id})" style="width:22px;height:22px;border-radius:6px;border:2px solid ${item.checked?'var(--green)':'var(--muted)'};background:${item.checked?'var(--green)':'transparent'};cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff">${item.checked?'<svg viewBox=\"0 0 24 24\" width=\"13\" height=\"13\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 6L9 17l-5-5\"/></svg>':''}</div>
+          <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;${item.checked?'text-decoration:line-through':''}">${item.name}</div></div>
+          <div style="text-align:right;flex-shrink:0"><div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--gold)">$${(item.price||0).toLocaleString('es-MX')}</div><div onclick="delSuperItem(${item.id})" style="font-size:9px;color:var(--muted);cursor:pointer;margin-top:2px">eliminar</div></div>`;
+        body.appendChild(div);
+      });
+      section.appendChild(body);
+    }
+    wrap.appendChild(section);
+  });
+}
+
+// Finalizar compra: descuenta del sobre Despensa y guarda historial
+function finishSuperShopping(){
+  const checked=(S.superList||[]).filter(i=>i.checked);
+  if(checked.length===0){toast('Marca lo que compraste primero');return}
+  const total=checked.reduce((a,b)=>a+(b.price||0),0);
+  // Guardar historial de cada producto comprado
+  if(!S.superHistory)S.superHistory={};
+  const now=Date.now();
+  checked.forEach(item=>{
+    const key=item.name.toLowerCase();
+    const h=S.superHistory[key]||{count:0};
+    S.superHistory[key]={name:item.name,cat:item.cat,price:item.price,count:h.count+1,lastBought:now,every:h.every};
+  });
+  // Registrar como gasto (movimiento) en finanzas — sobre Despensa
+  if(!S.movimientos)S.movimientos=[];
+  S.movimientos.push({tipo:'gasto',desc:'Despensa semanal 🛒',monto:total,cat:'Despensa',date:todayKey()});
+  // Quitar los comprados de la lista
+  S.superList=(S.superList||[]).filter(i=>!i.checked);
+  save(S);
+  renderSuper();
+  if(typeof renderFinanzas==='function')renderFinanzas();
+  toast(`✅ $${total.toLocaleString('es-MX')} descontados de Despensa`);
 }
 
 function saveMeta(){const titulo=document.getElementById('meta-titulo').value.trim(),emoji=document.getElementById('meta-emoji').value||'🎯',deadline=document.getElementById('meta-deadline').value;if(!titulo||!deadline){toast('❌ Completa los campos');return}if(!S.metas)S.metas=[];const grads=[['#7c3aed','#06b6d4'],['#f59e0b','#d97706'],['#ef4444','#b91c1c'],['#10b981','#047857'],['#3b82f6','#1d4ed8'],['#ec4899','#be185d'],['#8b5cf6','#6d28d9'],['#06b6d4','#0e7490']];const grad=grads[S.metas.length%grads.length];S.metas.push({titulo,emoji,ico:'target',grad,deadline,pct:0,createdDate:todayKey()});save(S);closeModal('modal-meta-new');toast(`🎯 Meta: ${titulo}`);render()}
@@ -2444,7 +2671,7 @@ function importData(e){const file=e.target.files[0];if(!file)return;const reader
 function resetAll(){if(!confirm('¿Reset total?'))return;localStorage.removeItem('hqv6');location.reload()}
 
 function goTo(page){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+page));document.querySelectorAll('.nb').forEach((b,i)=>b.classList.toggle('active',['dashboard','habits','shop','stats','more'][i]===page));if(page==='more')showMore('metas')}
-function showMore(sub){['metas','finanzas','gym','dieta','diario','cartas','playlist','rutina','confes','config'].forEach(s=>{const el=document.getElementById('more-'+s);if(el)el.style.display=s===sub?'block':'none'});document.querySelectorAll('.more-tab').forEach((b,i)=>{b.classList.toggle('active',['metas','finanzas','gym','dieta','diario','cartas','playlist','rutina','confes','config'][i]===sub)});if(sub==='finanzas'){renderFinanzas();renderShopping()}if(sub==='playlist')renderPlaylist();if(sub==='rutina')renderRutina();if(sub==='confes')renderConfes();if(sub==='gym'){switchGymView('today');renderGym()}if(sub==='diario')renderDiario();if(sub==='cartas')renderCartas();if(sub==='dieta')renderDieta()}
+function showMore(sub){['metas','finanzas','super','gym','dieta','diario','cartas','playlist','rutina','confes','config'].forEach(s=>{const el=document.getElementById('more-'+s);if(el)el.style.display=s===sub?'block':'none'});document.querySelectorAll('.more-tab').forEach((b,i)=>{b.classList.toggle('active',['metas','finanzas','super','gym','dieta','diario','cartas','playlist','rutina','confes','config'][i]===sub)});if(sub==='finanzas'){renderFinanzas()}if(sub==='super')renderSuper();if(sub==='playlist')renderPlaylist();if(sub==='rutina')renderRutina();if(sub==='confes')renderConfes();if(sub==='gym'){switchGymView('today');renderGym()}if(sub==='diario')renderDiario();if(sub==='cartas')renderCartas();if(sub==='dieta')renderDieta()}
 
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2800)}
 document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show')})});
@@ -2526,13 +2753,12 @@ runLoadingScreen();
 </div></div>
 
 <!-- SHOPPING ITEM MODAL -->
-<div class="modal-overlay modal-center" id="modal-shopping"><div class="modal-box">
-  <h3>Agregar a la lista</h3>
-  <div class="form-group"><label class="form-label">¿Qué necesitas comprar?</label><input type="text" class="form-input" id="shop-item-name" placeholder="Ej: Proteína, cuaderno..."></div>
-  <div class="form-group"><label class="form-label">Precio estimado ($MXN)</label><input type="number" class="form-input" id="shop-item-price" placeholder="0"></div>
-  <div class="form-group"><label class="form-label">Categoría</label><select class="form-select" id="shop-item-cat"></select></div>
-  <div class="form-group"><label class="form-label">Prioridad</label><select class="form-select" id="shop-item-priority"><option value="alta">🔴 Alta - Necesario</option><option value="media">🟡 Media - Pronto</option><option value="baja">🟢 Baja - Cuando se pueda</option></select></div>
-  <div class="modal-btns"><button class="mbtn mb-cancel" onclick="closeModal('modal-shopping')">Cancelar</button><button class="mbtn mb-save" onclick="saveShoppingItem()">Agregar</button></div>
+<div class="modal-overlay modal-center" id="modal-super"><div class="modal-box">
+  <h3>👻 Agregar producto</h3>
+  <div class="form-group"><label class="form-label">¿Qué necesitas?</label><input type="text" class="form-input" id="super-item-name" placeholder="Ej: Pollo, leche, papel..."></div>
+  <div class="form-group"><label class="form-label">Precio ($MXN)</label><input type="number" class="form-input" id="super-item-price" placeholder="0"></div>
+  <div class="form-group"><label class="form-label">Categoría</label><select class="form-select" id="super-item-cat"></select></div>
+  <div class="modal-btns"><button class="mbtn mb-cancel" onclick="closeModal('modal-super')">Cancelar</button><button class="mbtn mb-save" onclick="saveSuperItem()">Agregar</button></div>
 </div></div>
 
 <!-- DIET ITEM MODAL -->
