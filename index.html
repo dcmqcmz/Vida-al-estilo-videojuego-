@@ -2478,20 +2478,16 @@ function autoFillSuper(){
   const hist=S.superHistory||{};
   const existing=new Set((S.superList||[]).map(i=>i.name.toLowerCase()));
   let added=0;
-  // Productos que compras seguido (historial) o esenciales base
+  // Agregar TODOS los productos de la lista
   SUPER_COMMON.forEach(prod=>{
-    const h=hist[prod.name.toLowerCase()];
-    // Si lo has comprado 2+ veces, se considera recurrente
-    const recurrent = h && h.count>=2;
-    // Esenciales base que siempre sugerimos aunque no haya historial
-    const essential = ['Pechuga de pollo','Huevos','Atún','Yogurt griego','Jamón de pavo','Pan Bimbo','Tortillas','Leche','Garrafón de agua'].includes(prod.name);
-    if((recurrent||essential) && !existing.has(prod.name.toLowerCase())){
+    if(!existing.has(prod.name.toLowerCase())){
+      const h=hist[prod.name.toLowerCase()];
       S.superList.push({name:prod.name,price:h&&h.price?h.price:prod.price,cat:prod.cat,checked:false,id:Date.now()+added});
       added++;
     }
   });
   save(S);renderSuper();
-  toast(added>0?`✨ ${added} productos agregados`:'Ya tienes tus productos frecuentes');
+  toast(added>0?`✨ ${added} productos agregados`:'Ya tienes todos tus productos');
 }
 // Detecta productos "por agotarse" según cuándo los compraste
 function getSuperRunningLow(){
