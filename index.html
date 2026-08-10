@@ -793,6 +793,7 @@ span.ic svg{width:100%;height:100%}
 .clases-hora-col{width:52px;text-align:center;flex-shrink:0}
 .clases-days-grid{flex:1;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center}
 .clases-grid-wrap{min-width:560px}
+.clases-pendientes{margin-top:8px;font-size:9px;color:var(--gold);font-family:'JetBrains Mono',monospace;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:6px 10px;display:none}
 .clases-horario-grid{display:grid;grid-template-columns:52px repeat(5,1fr);gap:6px;grid-auto-rows:min-content}
 .clases-hora-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);display:flex;align-items:center;justify-content:center;padding:4px}
 .clase-card{--cc:#7c3aed;background:linear-gradient(135deg,color-mix(in srgb,var(--cc) 16%,var(--card)),var(--card));border:1px solid color-mix(in srgb,var(--cc) 45%,var(--border));border-left:3px solid var(--cc);border-radius:10px;padding:8px;cursor:pointer;transition:transform .15s var(--ease)}
@@ -1333,6 +1334,7 @@ span.ic svg{width:100%;height:100%}
         <div class="clases-grid-wrap">
           <div id="clases-horario-grid" class="clases-horario-grid"></div>
         </div>
+        <div id="clases-pendientes" class="clases-pendientes"></div>
       </div>
     </div>
 
@@ -2514,14 +2516,14 @@ function useMetaTemplate(tpl){const deadline=new Date();deadline.setDate(deadlin
 // ============================
 const CLASES_MATERIAS=[
   // Presenciales
-  {id:'marco',name:'Marco Fiscal',icon:'⚖️',color:'#10b981',horario:[{dia:'LUN',inicio:'07:00',fin:'08:30'},{dia:'MIE',inicio:'07:00',fin:'08:30'}],aula:'B-505',virtual:false},
-  {id:'descomex',name:'Desarrollo Comercio Exterior',icon:'🌐',color:'#06b6d4',horario:[{dia:'LUN',inicio:'10:00',fin:'11:30'},{dia:'MIE',inicio:'10:00',fin:'11:30'}],aula:'',virtual:false},
-  {id:'calculo',name:'Cálculo Diferencial',icon:'∫',color:'#a78bfa',horario:[{dia:'MIE',inicio:'08:30',fin:'10:00'}],aula:'',virtual:false},
-  {id:'macro',name:'Macroeconomía',icon:'📊',color:'#f59e0b',horario:[{dia:'LUN',inicio:'07:00',fin:'08:30'},{dia:'JUE',inicio:'07:00',fin:'08:30'}],aula:'B-501',virtual:false},
-  {id:'comport',name:'Comportamiento Organizacional',icon:'👥',color:'#2dd4bf',horario:[{dia:'MIE',inicio:'11:30',fin:'13:00'}],aula:'B-606',virtual:false},
-  {id:'estadistica',name:'Estadística Inferencial',icon:'📈',color:'#ec4899',horario:[{dia:'LUN',inicio:'12:30',fin:'13:00'},{dia:'MIE',inicio:'11:30',fin:'13:00'}],aula:'B-502',virtual:false},
+  {id:'marco',name:'Marco Fiscal del Comercio Exterior',icon:'⚖️',color:'#10b981',horario:[{dia:'LUN',inicio:'07:00',fin:'08:30'},{dia:'MIE',inicio:'07:00',fin:'08:30'}],aula:'B-505',virtual:false},
+  {id:'descomex',name:'Desarrollo Comercio Exterior de México',icon:'🌐',color:'#06b6d4',horario:[{dia:'LUN',inicio:'10:30',fin:'11:30'},{dia:'MIE',inicio:'10:30',fin:'11:30'}],aula:'B-502',virtual:false},
+  {id:'calculo',name:'Cálculo Diferencial',icon:'∫',color:'#a78bfa',horario:[],aula:'',virtual:false,pendiente:true},
+  {id:'macro',name:'Macroeconomía',icon:'📊',color:'#f59e0b',horario:[{dia:'MAR',inicio:'07:00',fin:'08:30'},{dia:'JUE',inicio:'07:00',fin:'08:30'}],aula:'B-501',virtual:false},
+  {id:'comport',name:'Comportamiento Organizacional',icon:'👥',color:'#2dd4bf',horario:[{dia:'MIE',inicio:'16:00',fin:'19:00'}],aula:'A-606',virtual:false},
+  {id:'estadistica',name:'Estadística Inferencial',icon:'📈',color:'#ec4899',horario:[{dia:'LUN',inicio:'11:30',fin:'13:00'},{dia:'MIE',inicio:'11:30',fin:'13:00'}],aula:'B-502',virtual:false},
   // Online
-  {id:'seminarios',name:'Seminarios Administrativos',icon:'💼',color:'#94a3b8',horario:[],aula:'',virtual:true},
+  {id:'seminarios',name:'Seminarios Administrativos',icon:'💼',color:'#94a3b8',horario:[{dia:'VIE',inicio:'10:00',fin:'13:00'}],aula:'',virtual:true},
   {id:'informatica',name:'Informática en Negocios',icon:'💻',color:'#94a3b8',horario:[{dia:'MAR',inicio:'17:30',fin:'20:30'}],aula:'',virtual:true},
 ];
 
@@ -2554,7 +2556,7 @@ function renderClases(){
   // Renderizar horario
   const grid=document.getElementById('clases-horario-grid');
   grid.innerHTML='';
-  const horas=['07:00','08:30','10:00','11:30','13:00','17:30'];
+  const horas=['07:00','10:00','10:30','11:30','16:00','17:30'];
   const dias=['LUN','MAR','MIE','JUE','VIE'];
   
   // Grid de clases
@@ -2610,6 +2612,18 @@ function renderClases(){
   const virtuales=CLASES_MATERIAS.filter(m=>m.virtual).length;
   document.getElementById('clases-count-virtuales').textContent=virtuales;
   document.getElementById('clases-count-materias').textContent=CLASES_MATERIAS.length;
+
+  // Materias con horario pendiente de asignar
+  const pendEl=document.getElementById('clases-pendientes');
+  const pendientes=CLASES_MATERIAS.filter(m=>m.pendiente||(m.horario.length===0 && !m.virtual));
+  if(pendEl){
+    if(pendientes.length>0){
+      pendEl.style.display='block';
+      pendEl.textContent=`⏳ Pendiente de horario: ${pendientes.map(m=>m.name).join(', ')}`;
+    } else {
+      pendEl.style.display='none';
+    }
+  }
   
   // Sumar horas presenciales
   let horas_total=0;
